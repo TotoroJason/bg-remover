@@ -3,6 +3,9 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { useDropzone } from 'react-dropzone';
 
+const REMOVE_BG_API_KEY = 'd7zAkszeHa2FWrHkypUbiscb';
+const REMOVE_BG_API_URL = 'https://api.remove.bg/v1.0/removebg';
+
 export default function Home() {
   const [originalImage, setOriginalImage] = useState<string | null>(null);
   const [processedImage, setProcessedImage] = useState<string | null>(null);
@@ -17,21 +20,38 @@ export default function Home() {
     setError(null);
 
     try {
-      const formData = new FormData();
-      formData.append('image', file);
+      // 读取原始图片用于预览
+      const originalArrayBuffer = await file.arrayBuffer();
+      const originalBase64 = btoa(
+        String.fromCharCode(...new Uint8Array(originalArrayBuffer))
+      );
+      setOriginalImage(`data:image/jpeg;base64,${originalBase64}`);
 
-      const response = await fetch('/api/remove-bg', {
+      // 直接调用 remove.bg API
+      const apiFormData = new FormData();
+      apiFormData.append('image_file', file);
+      apiFormData.append('size', 'auto');
+      apiFormData.append('format', 'png');
+
+      const response = await fetch(REMOVE_BG_API_URL, {
         method: 'POST',
-        body: formData,
+        headers: {
+          'X-Api-Key': REMOVE_BG_API_KEY,
+        },
+        body: apiFormData,
       });
 
       if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Remove.bg API error:', errorText);
         throw new Error('Failed to process image');
       }
 
-      const data = await response.json();
-      setOriginalImage(data.originalImage);
-      setProcessedImage(data.processedImage);
+      const processedArrayBuffer = await response.arrayBuffer();
+      const processedBase64 = btoa(
+        String.fromCharCode(...new Uint8Array(processedArrayBuffer))
+      );
+      setProcessedImage(`data:image/png;base64,${processedBase64}`);
     } catch (err) {
       setError('处理图片时出错，请检查 API Key 配置');
       console.error(err);
