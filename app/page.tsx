@@ -6,7 +6,6 @@ import { useDropzone } from 'react-dropzone';
 export default function Home() {
   const [originalImage, setOriginalImage] = useState<string | null>(null);
   const [processedImage, setProcessedImage] = useState<string | null>(null);
-  const [imageId, setImageId] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -33,7 +32,6 @@ export default function Home() {
       const data = await response.json();
       setOriginalImage(data.originalImage);
       setProcessedImage(data.processedImage);
-      setImageId(data.imageId);
     } catch (err) {
       setError('处理图片时出错，请检查 API Key 配置');
       console.error(err);
@@ -51,10 +49,10 @@ export default function Home() {
   });
 
   const downloadImage = () => {
-    if (!imageId) return;
+    if (!processedImage) return;
     const link = document.createElement('a');
-    link.href = `/api/remove-bg?id=${imageId}&type=processed`;
-    link.download = `bg-removed-${imageId}.png`;
+    link.href = processedImage;
+    link.download = `bg-removed-${Date.now()}.png`;
     link.click();
   };
 
@@ -136,7 +134,6 @@ export default function Home() {
                 onClick={() => {
                   setOriginalImage(null);
                   setProcessedImage(null);
-                  setImageId(null);
                   setError(null);
                 }}
                 className="px-8 py-3 bg-gray-600 hover:bg-gray-700 text-white rounded-lg font-semibold transition-colors"
