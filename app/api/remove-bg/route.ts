@@ -77,7 +77,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'Processed image not available' }, { status: 404 });
   }
 
-  return new NextResponse(buffer, {
+  return new NextResponse(buffer as unknown as BodyInit, {
     headers: {
       'Content-Type': type === 'original' ? 'image/jpeg' : 'image/png',
       'Content-Disposition': `attachment; filename="${type}-${imageId}.${type === 'original' ? 'jpg' : 'png'}"`,
