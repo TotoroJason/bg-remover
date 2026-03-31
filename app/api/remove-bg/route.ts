@@ -1,5 +1,3 @@
-export const runtime = 'edge';
-
 import { NextRequest, NextResponse } from 'next/server';
 
 const REMOVE_BG_API_URL = 'https://api.remove.bg/v1.0/removebg';
