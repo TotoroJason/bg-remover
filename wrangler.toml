@@ -1,0 +1,12 @@
+#:schema node_modules/@opennextjs/cloudflare/wrangler.json
+name = "bg-remover-2"
+compatibility_date = "2024-11-01"
+pages_build_output_dir = ".open-next"
+
+[build]
+command = "npx open-next build"
+
+[[redirects]]
+from = "/*"
+to = "/index.html"
+status = 200
